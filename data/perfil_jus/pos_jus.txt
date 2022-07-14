@@ -1,0 +1,21 @@
+yo=33,9mm
+
+w17 -> y+yo = 34,0mm
+w18 -> y+yo = 36,0mm
+w19 -> y+yo = 38,0mm
+w20 -> y+yo = 40,0mm
+w21 -> y+yo = 45,0mm
+w22 -> y+yo = 50,0mm
+w23 -> y+yo = 55,0mm
+w24 -> y+yo = 60,0mm
+w25 -> y+yo = 65,0mm
+w26 -> y+yo = 70,0mm
+w27 -> y+yo = 75,0mm
+w28 -> y+yo = 80,0mm
+w29 -> y+yo = 85,0mm
+w30 -> y+yo = 90,0mm
+w31 -> y+yo = 95,0mm
+w32 -> y+yo = 100,0mm
+w33 -> y+yo = 105,0mm
+w34 -> y+yo = 110,0mm
+
