@@ -1,0 +1,7 @@
+HRE3 results
+u_bar = 6.150405200512674
+variance = 6.360147865376834
+std_dev = 2.521933358631198
+turbulence intensity = 0.41004344858790426
+dissimetry coefficient = 0.30411072124385535
+flatenning coefficient = 2.4876376467788606

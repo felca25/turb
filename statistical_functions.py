@@ -12,13 +12,28 @@ def temporal_mean(phi:np.ndarray):
     
     return phi_bar
 
+def moving_average(arr, window):
+    i = 0
+    moving_average = []
+    
+    while i < len(arr) - window + 1:
+        
+        window_avg = np.sum(arr[i:i+window])/window
+        
+        moving_average.append(window_avg)
+        
+        i += 1
+    
+    return moving_average
+
 def calculate_fluctuation(u:np.ndarray, u_bar:float):
     return u - u_bar
 
+
 def calculate_ordered_moment(phi_prime:np.ndarray, order: int):
     
-    phi_prime_bar = temporal_mean(phi_prime)
-    variance = phi_prime_bar ** order
+    phi_prime_bar = temporal_mean(phi_prime ** order)
+    variance = phi_prime_bar
     
     return variance
 
@@ -47,3 +62,29 @@ def calculate_flatenning_coef(phi_prime:np.ndarray):
     sigma_2 = calculate_ordered_moment(phi_prime, 2)
     
     return sigma_4 / sigma_2**2
+
+def pdf(u_t, N):
+    N_x = len(u_t)
+    
+    prob = np.zeros(N)
+    u = np.sort(u_t)
+    x = np.linspace(min(u), max(u), N)
+    pdf = pdf_algorithm(u, x, prob, N, N_x, (1/N))
+    
+    return x, pdf
+
+def pdf_algorithm(u, x, pdf, N, N_x, TOL):
+    k = 0
+    i = 0
+    p = 0
+    while k < N_x and i < N:
+        print(i, k, p)
+        if u[k] > x[i] - 0.1*TOL and u[k] < x[i+1]+0.1*TOL:
+            k += 1
+            p += 1
+        else:
+            pdf[i] = p/N_x
+            p = 0 
+            i += 1
+        
+    return pdf
