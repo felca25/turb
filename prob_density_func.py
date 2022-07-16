@@ -5,8 +5,6 @@ from matplotlib import rc
 import numpy as np
 from get_data import TemporalAnalysis
 plt.rcParams['font.family'] = 'Times New Roman'
-
-
 # from numba import njit
 
 def test():
@@ -63,7 +61,12 @@ def pdf_algorithm(u, x, pdf, N, N_x, TOL):
             i += 1
         
     return pdf
-        
+    
+def plot_pdf(data):
+    x, pdf_u = pdf(hre.u,int(len(hre.u)/2))
+    mu = hre.u_bar
+    sigma = np.sqrt(hre.variance)
+    gauss = norm.pdf(x, mu, sigma)/100
     
     
 
