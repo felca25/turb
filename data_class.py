@@ -1,0 +1,235 @@
+from dataclasses import dataclass, field
+import enum
+from statistics import covariance
+from matplotlib import pyplot as plt
+from scipy.stats import norm
+import os, os.path
+import numpy as np
+import pandas as pd
+import json
+from statistical_functions import *
+
+def export_data(df, path):
+    print('Exporting csv ...')
+    df.to_csv(f'{path}.csv')
+    print('Export complete')
+    
+    return df
+
+@dataclass
+class TemporalData:
+    
+    path: str
+    name: str
+    index: str
+    u: np.ndarray
+    times: np.ndarray
+    final_time: float = field(init=0)
+    time_step: float = field(init=0)
+    N: int = field(init=0)
+    u_bar_t: float = field(init=0)
+    u_prime: np.ndarray = field(init=0)
+    kinetic_energy: float = field(init=0)
+    variance: float = field(init=0)
+    u_rms: float = field(init=0)
+    turb_int: float = field(init=0)
+    diss_coef: float = field(init=0)
+    flat_coef: float = field(init=0)
+    u_x_pdf : np.ndarray = field(init=0)
+    u_pdf: np.ndarray = field(init=0)
+    u_prime_x_pdf : np.ndarray = field(init=0)
+    u_prime_pdf: np.ndarray = field(init=0)
+    
+    def __post_init__(self) -> None:
+        self.N = len(self.u)
+        self.final_time = self.times[-1]
+        self.time_step = round(self.times[-1] - self.times[-2], 4)
+        self.calculate_properties()
+    
+    def calculate_properties(self) -> None:
+        
+        self.u_bar_t = temporal_mean(self.u)
+        self.u_prime = calculate_fluctuation(self.u, self.u_bar_t)
+        self.kinetic_energy = .5 * calculate_ordered_moment(self.u_prime, 2)
+        self.variance = calculate_ordered_moment(self.u_prime, 2)
+        self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime, 2))
+        self.turb_int = calculate_turbulence_intensity(self.u_bar_t, self.u_prime)
+        self.diss_coef = calculate_dissimetry_coef(self.u_prime)
+        self.flat_coef = calculate_flatenning_coef(self.u_prime)
+        self.u_x_pdf, self.u_pdf = pdf(self.u)
+        self.u_prime_x_pdf, self.u_prime_pdf = pdf(self.u_prime)
+        
+    def save_txt(self):
+        try:
+            os.mkdir('txt_results')
+        except FileExistsError:
+            pass
+        
+        with open(f'txt_results/{self.name}.txt', 'w') as outfile:
+            
+            outfile.write(f'{self.name.upper()} results\n\n')
+            outfile.write(f'u_bar_t = {self.u_bar_t}\n'\
+                          f'nvariance = {self.variance}\n'\
+                            f'std_dev = {self.u_rms}\n'\
+                                f'turbulence intensity = {self.turb_int}\n'\
+                                    f'dissimetry coefficient = {self.diss_coef}\n'\
+                                        f'flatenning coefficient = {self.flat_coef}\n')
+    
+        return 1
+    
+    def save_json(self):
+        self.times = self.times.tolist()
+        self.u = self.u.tolist()
+        self.u_prime = self.u_prime.tolist()
+        self.u_x_pdf = self.u_x_pdf.tolist()
+        self.u_pdf = self.u_pdf.tolist()
+        self.u_prime_x_pdf = self.u_prime_x_pdf.tolist()
+        self.u_prime_pdf = self.u_prime_pdf.tolist()
+        
+        try:
+            os.mkdir('json_results')
+        except FileExistsError:
+            pass
+        
+        with open(f'json_results/{self.name}.json', 'w') as outfile:
+            json.dump(self.__dict__, outfile)
+            
+        self.times = np.array(self.times)
+        self.u = np.array(self.u)
+        self.u_prime = np.array(self.u_prime)
+        self.u_x_pdf = np.array(self.u_x_pdf)
+        self.u_pdf = np.array(self.u_pdf)
+        self.u_prime_x_pdf = np.array(self.u_prime_x_pdf)
+        self.u_prime_pdf = np.pdf(self.u_prime_pdf)
+
+        
+@dataclass
+class TemporalDatas:
+    name : str
+    data_arr : list
+    times : np.ndarray = field(init=0)
+    N : int = field(init=0)
+    N_u : int = field(init=0)
+    final_time : float = field(init=0)
+    time_step : np.ndarray = field(init=0)
+    u : np.ndarray = field(init=0)
+    u_prime : np.ndarray = field(init=0)
+    u_bar_s : np.ndarray = field(init=0)
+    u_bar_t : float = field(init=0)
+    cov : float = field(init=0)
+    corr_coef: float = field(init=0)
+    
+    def __post_init__(self):
+        
+        self.data_arr.sort(key= lambda x: x.path)
+        self.times = self.data_arr[0].times
+        self.N = len(self.data_arr)
+        self.N_u = len(self.data_arr[0].u)
+        self.final_time = self.times[-1]
+        self.time_step = round(self.times[-1] - self.times[-2], 4)
+        self.u = np.array([data.u for data in self.data_arr])
+        self.u_bar_s = statistical_mean(self.data_arr)
+        self.u_bar_t = temporal_mean(self.u_bar_s)
+        self.u_prime = calculate_fluctuation(self.u, self.u_bar_s)
+        self.cov = 0.
+        self.corr_coef = 0.
+        
+    def calculate_cov_corr(self, index_a, index_b):
+        print(self.data_arr[index_a].name)
+        print(self.data_arr[index_b].name)
+        
+        self.cov = self.covariance(index_a, index_b)
+        self.corr_coef = self.correlation(index_a, index_b)
+        
+        return (self.cov, self.corr_coef)
+        
+    def covariance(self, index_a:int, index_b:int):
+        print(self.data_arr[index_a].name)
+        print(self.data_arr[index_b].name)
+        # cov = np.cov(self.data_arr[index_a].u_prime,
+        #                       self.data_arr[index_b].u_prime)
+        cov = covariance(self.data_arr[index_a].u_prime,
+                                self.data_arr[index_b].u_prime)
+        
+        return cov
+        
+    def correlation(self, index_a:int, index_b:int):
+        cov = covariance(self.data_arr[index_a].u_prime,
+                        self.data_arr[index_b].u_prime)
+        # corr_coef = np.corrcoef(self.data_arr[index_a].u_prime,
+        #                 self.data_arr[index_b].u_prime)
+        corr_coef = cov / (self.data_arr[index_a].u_rms * self.data_arr[index_b].u_rms)
+        return corr_coef
+    
+    def to_data_frame(self, properties):
+        name = self.name
+        treated = [list(self.data_arr[0].times),]
+        headers = ['tempos[s]',]
+        
+        if name == 'perfil_mon' or name == 'perfil_jus':
+            
+            for property, in zip(properties):
+                for i, temporal_data, in enumerate(self.data_arr):
+                    if property == 'u':
+                        treated.append(list(temporal_data.u))
+                    headers.append(f'{property}_{i+1}')
+                    
+            df = pd.DataFrame(np.transpose(treated), columns=headers)
+            
+            df['u_bar'] = df.mean(axis=1)
+            for i in range(len(self.data_arr)):   
+                df[f'u_prime_{i+1}'] = df['u_bar'] - df[f'u_{i+1}']
+            return df
+        
+        else:
+            for property, in zip(properties):
+                for i, temporal_data, in enumerate(self.data_arr):
+                    if property == 'u':
+                        treated.append(list(temporal_data.u))
+                    headers.append(f'{property}_{i+1}')
+                    
+            df = pd.DataFrame(np.transpose(treated), columns=headers)
+            
+            df['u_bar'] = df.mean(axis=1)
+            for i in range(len(self.data_arr)):   
+                df[f'u_prime_{i+1}'] = df['u_bar'] - df[f'u_{i+1}']
+            return df
+        
+    
+
+def main() -> None:
+    FOLDER = 'data/lre/'
+    paths = [FOLDER+name for name in os.listdir(FOLDER) if os.path.isfile(os.path.join(FOLDER, name))]
+    print(paths)
+    N = len(paths)
+
+    data_arr = []
+    
+    for i, path in enumerate(paths):
+        splitted_path = path.split('/')
+        name = splitted_path[-1][:-4]
+        index = splitted_path[-1][-5]
+        
+        t, u = np.loadtxt(path, unpack=True)
+        data = TemporalData(path, name, index, u=u, times=t)
+        data.save_txt()
+        data_arr.append(data)
+        
+    folder = FOLDER.split('/')[-2]
+    stat_data = TemporalDatas(name=folder, data_arr=data_arr)
+    cov, corr = stat_data.calculate_cov_corr(0, 1)
+    print(cov, corr)
+    
+    df = stat_data.to_data_frame(['u',])
+    folder = FOLDER.split('/')[-2]
+    export_data(df, f'CSV/{folder}')
+    print(df)
+    
+    print(stat_data.__str__())
+    return None
+
+if __name__ == '__main__':
+    main()
+    
+    
+    

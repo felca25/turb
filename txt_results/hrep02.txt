@@ -1,0 +1,8 @@
+HREP02 results
+
+u_bar_t = 6.149675987303871
+nvariance = 6.563968681531082
+std_dev = 2.5620243327359487
+turbulence intensity = 0.4166112715572819
+dissimetry coefficient = 0.2541741463485175
+flatenning coefficient = 2.4098806362508163

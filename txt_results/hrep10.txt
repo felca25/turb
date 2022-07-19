@@ -1,0 +1,8 @@
+HREP10 results
+
+u_bar_t = 6.281114258682856
+nvariance = 6.60465785583097
+std_dev = 2.569952889807704
+turbulence intensity = 0.40915557080577947
+dissimetry coefficient = 0.23107384202206865
+flatenning coefficient = 2.4148066175507106

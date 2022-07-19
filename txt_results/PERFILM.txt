@@ -1,0 +1,8 @@
+PERFILM results
+
+u_bar_t = 6.840769981077895
+nvariance = 0.0016126163395416763
+std_dev = 0.040157394581093984
+turbulence intensity = 0.005870303298045758
+dissimetry coefficient = 0.117981499743889
+flatenning coefficient = 2.665341437501894

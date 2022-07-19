@@ -3,7 +3,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import numpy as np
-from get_data import TemporalAnalysis
+from test_temporal import TemporalAnalysis
 plt.rcParams['font.family'] = 'Times New Roman'
 # from numba import njit
 
@@ -63,10 +63,23 @@ def pdf_algorithm(u, x, pdf, N, N_x, TOL):
     return pdf
     
 def plot_pdf(data):
-    x, pdf_u = pdf(hre.u,int(len(hre.u)/2))
-    mu = hre.u_bar
-    sigma = np.sqrt(hre.variance)
+    x, pdf_u = pdf(data.u,int(len(data.u)/2))
+    mu = data.u_bar
+    sigma = np.sqrt(data.variance)
     gauss = norm.pdf(x, mu, sigma)/100
+    
+    plt.figure(f'probability_density_function_{data.re_type}{data.id}', [8, 8])
+    plt.title(f'Velocity by Probablility Density Function {data.re_type}{data.id}')
+    plt.grid(1, 'both')
+    # plt.hist(hre.u, 500)
+    # plt.scatter(x, pdf_u, marker='.', linewidths=.1, c='k')
+    plt.plot(x, pdf_u, '-b')
+    # x = np.linspace(mu - 3*sigma, mu + 3*sigma, 1000)
+    plt.plot(x, gauss, '-r', lw=1.75)
+    plt.vlines(data.u_bar, min(pdf_u), max(gauss), colors='k', linestyles='dashed')
+    plt.xlabel('Velocity $u$ [m/s]')
+    plt.ylabel('Probability Density Function $P(u)$')
+    plt.show()
     
     
 

@@ -1,6 +1,7 @@
 HRE5 results
-u_bar = 6.247361637062798
-variance = 6.407063788301478
+
+u_bar_t = 6.247361637062798
+nvariance = 6.407063788301478
 std_dev = 2.5312178468676847
 turbulence intensity = 0.4051658914462552
 dissimetry coefficient = 0.2291623038789415

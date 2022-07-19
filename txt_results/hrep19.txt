@@ -1,0 +1,8 @@
+HREP19 results
+
+u_bar_t = 6.290228438014994
+nvariance = 6.856212741183076
+std_dev = 2.6184370798594867
+turbulence intensity = 0.41627058630096214
+dissimetry coefficient = 0.26738509533296073
+flatenning coefficient = 2.404497693213141
