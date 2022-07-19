@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-import enum
-from statistics import covariance
 from matplotlib import pyplot as plt
 from scipy.stats import norm
 import os, os.path
@@ -8,13 +6,7 @@ import numpy as np
 import pandas as pd
 import json
 from statistical_functions import *
-
-def export_data(df, path):
-    print('Exporting csv ...')
-    df.to_csv(f'{path}.csv')
-    print('Export complete')
-    
-    return df
+from data_man import export_data
 
 @dataclass
 class TemporalData:
@@ -77,7 +69,7 @@ class TemporalData:
     
         return 1
     
-    def save_json(self):
+    def to_list(self)-> None:
         self.times = self.times.tolist()
         self.u = self.u.tolist()
         self.u_prime = self.u_prime.tolist()
@@ -85,6 +77,18 @@ class TemporalData:
         self.u_pdf = self.u_pdf.tolist()
         self.u_prime_x_pdf = self.u_prime_x_pdf.tolist()
         self.u_prime_pdf = self.u_prime_pdf.tolist()
+        
+    def to_array(self) -> None:
+        self.times = np.array(self.times)
+        self.u = np.array(self.u)
+        self.u_prime = np.array(self.u_prime)
+        self.u_x_pdf = np.array(self.u_x_pdf)
+        self.u_pdf = np.array(self.u_pdf)
+        self.u_prime_x_pdf = np.array(self.u_prime_x_pdf)
+        self.u_prime_pdf = np.array(self.u_prime_pdf)
+    
+    def save_json(self):
+        self.to_list()
         
         try:
             os.mkdir('json_results')
@@ -94,13 +98,7 @@ class TemporalData:
         with open(f'json_results/{self.name}.json', 'w') as outfile:
             json.dump(self.__dict__, outfile)
             
-        self.times = np.array(self.times)
-        self.u = np.array(self.u)
-        self.u_prime = np.array(self.u_prime)
-        self.u_x_pdf = np.array(self.u_x_pdf)
-        self.u_pdf = np.array(self.u_pdf)
-        self.u_prime_x_pdf = np.array(self.u_prime_x_pdf)
-        self.u_prime_pdf = np.pdf(self.u_prime_pdf)
+        self.to_array()
 
         
 @dataclass
@@ -159,7 +157,60 @@ class TemporalDatas:
         # corr_coef = np.corrcoef(self.data_arr[index_a].u_prime,
         #                 self.data_arr[index_b].u_prime)
         corr_coef = cov / (self.data_arr[index_a].u_rms * self.data_arr[index_b].u_rms)
+        
         return corr_coef
+    
+    def save_txt(self):
+        try:
+            os.mkdir('txt_results')
+        except FileExistsError:
+            pass
+        
+        with open(f'txt_results/{self.name}.txt', 'w') as outfile:
+            
+            outfile.write(f'{self.name.upper()} results\n\n')
+            outfile.write(f'u_bar_t = {self.u_bar_t}\n'\
+                          f'nvariance = {self.variance}\n'\
+                            f'std_dev = {self.u_rms}\n'\
+                                f'turbulence intensity = {self.turb_int}\n'\
+                                    f'dissimetry coefficient = {self.diss_coef}\n'\
+                                        f'flatenning coefficient = {self.flat_coef}\n')
+            
+    def to_list(self)-> None:
+        
+        for data in self.data_arr:
+            data.to_list()
+            
+        self.times = self.times.tolist()
+        self.u = self.u.tolist()
+        self.u_bar_s = self.u_bar_s.tolist()
+        self.u_prime = self.u_prime.tolist()
+        
+        
+    def to_array(self) -> None:
+        
+        for data in self.data_arr:
+                data.to_array()
+                
+        self.times = np.array(self.times)
+        self.u = np.array(self.u)
+        self.u_bar_s = np.array(self.u_bar_s)
+        self.u_prime = np.array(self.u_prime)
+            
+    def save_json(self):
+        
+        self.to_list()
+        
+        try:
+            os.mkdir('json_results')
+        except FileExistsError:
+            pass
+        
+        with open(f'json_results/{self.name}.json', 'w') as outfile:
+            json.dump(self.__dict__, outfile)
+            
+        self.to_array()
+
     
     def to_data_frame(self, properties):
         name = self.name
@@ -213,10 +264,12 @@ def main() -> None:
         t, u = np.loadtxt(path, unpack=True)
         data = TemporalData(path, name, index, u=u, times=t)
         data.save_txt()
+        data.save_json()
         data_arr.append(data)
         
     folder = FOLDER.split('/')[-2]
     stat_data = TemporalDatas(name=folder, data_arr=data_arr)
+    stat_data.save_json()
     cov, corr = stat_data.calculate_cov_corr(0, 1)
     print(cov, corr)
     
