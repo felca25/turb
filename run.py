@@ -17,6 +17,7 @@ def run(FOLDERS) -> None:
         for i, path in enumerate(paths):
             splitted_path = path.split('/')
             name = splitted_path[-1][:-4]
+            
             if name == 'hre' or name == 'lre':
                 index = splitted_path[-1][-5]
             elif name == 'PERFILM':
@@ -27,6 +28,13 @@ def run(FOLDERS) -> None:
             t, u = np.loadtxt(path, unpack=True)
             data = TemporalData(path, name, index, u=u, times=t)
             data.save_txt()
+            
+            if name == 'hre' or name == 'lre':
+                index = splitted_path[-1][-5]
+            elif name == 'PERFILM':
+                index = splitted_path[-1][-2:]
+            else:
+                index = splitted_path[-1][-6:-4]
             
             data.save_json()
             data_arr.append(data)

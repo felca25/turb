@@ -37,6 +37,9 @@ class TemporalData:
         self.final_time = self.times[-1]
         self.time_step = round(self.times[-1] - self.times[-2], 4)
         self.calculate_properties()
+        
+        if self.name[:-1] == 'lre' or self.name[:-1] == 'hre':
+            self.index = self.index[1]
     
     def calculate_properties(self) -> None:
         
@@ -89,16 +92,18 @@ class TemporalData:
     
     def save_json(self):
         self.to_list()
+        dir_name = self.path.split('/')[-2]
         
         try:
-            os.mkdir('json_results')
+            os.mkdir(f'json_results/{dir_name}')
         except FileExistsError:
+            
             pass
         if self.name == 'PERFILM':
-            with open(f'json_results/{self.name}{self.index}.json', 'w') as outfile:
+            with open(f'json_results/{dir_name}/{self.name}{self.index}.json', 'w') as outfile:
                 json.dump(self.__dict__, outfile)
         else:
-            with open(f'json_results/{self.name}.json', 'w') as outfile:
+            with open(f'json_results/{dir_name}/{self.name}.json', 'w') as outfile:
                 json.dump(self.__dict__, outfile)
             
         self.to_array()
@@ -108,6 +113,7 @@ class TemporalData:
 class TemporalDatas:
     name : str
     data_arr : list
+    path : str = field(init=0)
     times : np.ndarray = field(init=0)
     N : int = field(init=0)
     N_u : int = field(init=0)
@@ -131,6 +137,7 @@ class TemporalDatas:
     def __post_init__(self):
         
         self.data_arr.sort(key= lambda x: x.path)
+        self.path = "/".join(self.data_arr[0].path.split('/')[:-1])+f'/{self.name}'
         self.times = self.data_arr[0].times
         self.N = len(self.data_arr)
         self.N_u = len(self.data_arr[0].u)
@@ -148,7 +155,7 @@ class TemporalDatas:
         
     def calculate_properties(self) -> None:
         self.variance = calculate_ordered_moment(self.u_prime, 2)
-        self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime, 2))
+        self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime_bar_s, 2))
         self.kinetic_energy = calculate_kinetic_energy(self.u_prime)
         self.turb_int = calculate_turbulence_intensity(self.u_bar_s, self.u_prime_bar_s)
         self.diss_coef = calculate_dissimetry_coef(self.u_prime_bar_s)
@@ -214,7 +221,7 @@ class TemporalDatas:
         self.u_prime_bar_s = self.u_prime_bar_s.tolist()
         self.kinetic_energy = self.kinetic_energy.tolist()
         self.variance = self.variance.tolist()
-        self.u_rms = self.u_rms.tolist()
+        # self.u_rms = self.u_rms.tolist()
         self.turb_int = self.turb_int.tolist()
         self.u_x_pdf = self.u_x_pdf.tolist()
         self.u_pdf = self.u_pdf.tolist()
@@ -235,7 +242,7 @@ class TemporalDatas:
         self.u_prime_bar_s = np.array(self.u_prime_bar_s)
         self.kinetic_energy = np.array(self.kinetic_energy)
         self.variance = np.array(self.variance)
-        self.u_rms = np.array(self.u_rms)
+        # self.u_rms = np.array(self.u_rms)
         self.turb_int = np.array(self.turb_int)
         self.u_x_pdf = np.array(self.u_x_pdf)
         self.u_pdf = np.array(self.u_pdf)
@@ -247,11 +254,13 @@ class TemporalDatas:
         auxiliary = self.to_list()
         
         try:
-            os.mkdir('json_results')
+            os.mkdir(f'json_results/{self.name}')
         except FileExistsError:
+    
             pass
-        with open(f'json_results/{self.name}.json', 'w') as outfile:
+        with open(f'json_results/{self.name}/{self.name}.json', 'w') as outfile:
             json.dump(self.__dict__, outfile)
+            
         
         self.data_arr = auxiliary
         self.to_array()
