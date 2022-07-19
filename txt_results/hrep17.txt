@@ -1,7 +1,7 @@
 HREP17 results
 
 u_bar_t = 6.209482530671998
-nvariance = 6.601600317078602
+variance = 6.601600317078602
 std_dev = 2.5693579581441357
 turbulence intensity = 0.4137797224571749
 dissimetry coefficient = 0.29412345517999416

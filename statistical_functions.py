@@ -53,7 +53,15 @@ def calculate_ordered_moment(phi_prime:np.ndarray, order: int):
     
     return variance
 
-def root_mean_sqrt(phi_prime:np.ndarray):
+
+
+def calculate_kinetic_energy(phi_prime:np.ndarray):
+    
+    kinetic = 0.5 * calculate_ordered_moment(phi_prime, 2)
+    
+    return kinetic
+
+def calculate_kinetic_energy(phi_prime:np.ndarray):
     
     variance = calculate_ordered_moment(phi_prime, 2)
     
@@ -61,7 +69,7 @@ def root_mean_sqrt(phi_prime:np.ndarray):
 
 def calculate_turbulence_intensity(phi_bar:float, phi_prime:np.ndarray):
     
-    phi_rms = root_mean_sqrt(phi_prime)
+    phi_rms = calculate_kinetic_energy(phi_prime)
     
     return phi_rms / phi_bar
     

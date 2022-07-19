@@ -20,12 +20,12 @@ def get_spatial_points(path):
     with open(path, 'r') as f:
         yo = f.readline()[3:-3].split(',')
         yo = float('.'.join(yo))
-        # points.append(yo)
+        
         data = f.readlines()[1:]
         for line in data:
             line = round(float('.'.join(line[14:-3].split(','))) - yo, 1)
             points.append(line)
-    print(points)
+            
     return points
 
 def main():

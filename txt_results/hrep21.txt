@@ -1,7 +1,7 @@
 HREP21 results
 
 u_bar_t = 6.319109131416747
-nvariance = 6.643249493245981
+variance = 6.643249493245981
 std_dev = 2.577450192194988
 turbulence intensity = 0.40788189262006347
 dissimetry coefficient = 0.2698617926512481

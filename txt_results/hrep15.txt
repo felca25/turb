@@ -1,7 +1,7 @@
 HREP15 results
 
 u_bar_t = 6.255849642922518
-nvariance = 6.552240680554863
+variance = 6.552240680554863
 std_dev = 2.5597344941526385
 turbulence intensity = 0.40917455505801104
 dissimetry coefficient = 0.2421631321396639

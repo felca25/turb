@@ -1,7 +1,7 @@
 HREP03 results
 
 u_bar_t = 6.159293316242495
-nvariance = 6.604183759092598
+variance = 6.604183759092598
 std_dev = 2.5698606497420435
 turbulence intensity = 0.4172330359661778
 dissimetry coefficient = 0.27947593404130683

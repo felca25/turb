@@ -1,7 +1,7 @@
 HREP20 results
 
 u_bar_t = 6.201164804980761
-nvariance = 6.432219043217071
+variance = 6.432219043217071
 std_dev = 2.5361819814865556
 turbulence intensity = 0.40898477322349186
 dissimetry coefficient = 0.2840168429647781
