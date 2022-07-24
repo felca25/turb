@@ -20,6 +20,7 @@ def statistical_mean(data_list):
 
     for j in range(len(spacial_averages)):
         spacial_avg = 0.
+        
         for i, data in enumerate(data_list):
             spacial_avg += data.u[j]
             spacial_averages[j] = spacial_avg / len(data_list)
@@ -60,13 +61,13 @@ def calculate_kinetic_energy(u:np.ndarray):
 
 def calculate_std_dev(phi_prime:np.ndarray):
     
-    variance = calculate_ordered_moment(phi_prime, 2)
+    variance = calculate_ordered_moment(phi_prime, 2) # Variance
     
     return np.sqrt(variance)
 
 def calculate_turbulence_intensity(u_bar:float, u_prime:np.ndarray):
     
-    phi_rms = calculate_std_dev(u_prime)
+    phi_rms = calculate_std_dev(u_prime) # Root mean square velocity
     
     return phi_rms / np.abs(u_bar)
     
@@ -105,7 +106,7 @@ def pdf(u_t, N=None):
     print('Calculating pdf...')
     var = variance(u)
     pdf = pdf_algorithm(u, x, prob, N, N_u, var, (1/N))
-    print('Done alculating pdf.')
+    print(f'Done calulating pdf.\npdf sums to: {np.sum(pdf)}')
     
     return (x, pdf)
 
@@ -133,14 +134,14 @@ def pdf_algorithm(u, x, pdf, N, N_u, var, TOL):
     i = 0
     p = 0
     while k < N_u and i < N:
-        if u[k] > x[i] - 0.1*TOL and u[k] < x[i+1]+0.1*TOL:
+        if u[k] > x[i] - TOL and u[k] < x[i+1] + TOL:
             k += 1
             p += 1
         else:
             pdf[i] = (p)/(N_u)
             p = 0 
             i += 1
-        
+    
     return pdf
 
 def covariance(a_prime:np.ndarray, b_prime:np.ndarray):

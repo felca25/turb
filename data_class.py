@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import json
 from statistical_functions import *
-from data_man import export_data
+from data_man import export_data, get_spatial_points
 
 @dataclass
 class TemporalData:
@@ -48,11 +48,13 @@ class TemporalData:
         self.kinetic_energy = .5 * calculate_ordered_moment(self.u_prime, 2)
         self.variance = calculate_ordered_moment(self.u_prime, 2)
         self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime, 2))
-        self.turb_int = calculate_turbulence_intensity(self.u_bar_t, self.u_prime)*100
+        self.turb_int = calculate_turbulence_intensity(self.u_bar_t, self.u_prime)
         self.diss_coef = calculate_dissimetry_coef(self.u_prime)
         self.flat_coef = calculate_flatenning_coef(self.u_prime)
-        self.u_x_pdf, self.u_pdf = pdf(self.u, 500)
-        self.u_prime_x_pdf, self.u_prime_pdf = pdf(self.u_prime)
+        self.u_x_pdf, self.u_pdf = pdf(self.u, len(self.u))
+        # calculating pdf of u_prime
+        print(f'calculating u_prime pdf of {self.name}')
+        self.u_prime_x_pdf, self.u_prime_pdf = pdf(self.u_prime, len(self.u))
         
     def save_txt(self):
         try:
@@ -340,41 +342,90 @@ class TemporalDatas:
         
     
 
-def main() -> None:
-    FOLDER = 'data/lre/'
-    paths = [FOLDER+name for name in os.listdir(FOLDER) if os.path.isfile(os.path.join(FOLDER, name))]
-    print(paths)
-    N = len(paths)
+def run(FOLDERS) -> None:
+    
+    for folder in FOLDERS:
+        
+        FOLDER = f'data/{folder}/'
+        paths = [FOLDER+name for name in os.listdir(FOLDER) if os.path.isfile(os.path.join(FOLDER, name))]
+        print(paths)
+        N = len(paths)
 
-    data_arr = []
-    
-    for i, path in enumerate(paths):
-        splitted_path = path.split('/')
-        name = splitted_path[-1][:-4]
-        index = splitted_path[-1][-5]
+        data_arr = []
         
-        t, u = np.loadtxt(path, unpack=True)
-        data = TemporalData(path, name, i, u=u, times=t)
-        data.save_txt()
-        data.save_json()
-        data_arr.append(data)
+        for i, path in enumerate(paths):
+            splitted_path = path.split('/')
+            name = splitted_path[-1][:-4]
+            
+            if name == 'hre' or name == 'lre':
+                index = splitted_path[-1][-5]
+            elif name == 'PERFILM':
+                index = splitted_path[-1][-2:]
+            else:
+                index = splitted_path[-1][-6:-4]
+            
+            t, u = np.loadtxt(path, unpack=True)
+            data = TemporalData(path, name, index, u=u, times=t)
+            data.save_txt()
+            
+            if name == 'hre' or name == 'lre':
+                index = splitted_path[-1][-5]
+            elif name == 'PERFILM':
+                index = splitted_path[-1][-2:]
+            else:
+                index = splitted_path[-1][-6:-4]
+            
+            data.save_json()
+            data_arr.append(data)
+                  
+        folder = FOLDER.split('/')[-2]
+        stat_data = TemporalDatas(name=folder, data_arr=data_arr)
         
-    folder = FOLDER.split('/')[-2]
-    stat_data = TemporalDatas(name=folder, data_arr=data_arr)
-    stat_data.save_json()
-    cov, corr = stat_data.calculate_cov_corr(0, 1)
-    print(cov, corr)
-    
-    df = stat_data.to_data_frame(['u',])
-    folder = FOLDER.split('/')[-2]
-    export_data(df, f'CSV/{folder}')
-    print(df)
-    
-    print(stat_data.__str__())
+        if folder == 'lre'or folder == 'hre':
+            
+            cov_arr = []
+            corr_arr = []
+            for n in range(N-1):
+                cov, corr = stat_data.calculate_cov_corr(n, n+1)
+                print(cov, corr)
+                cov_arr.append(cov)
+                corr_arr.append(corr)
+                
+            stat_data.cov = cov_arr
+            stat_data.corr_coef = corr_arr
+            stat_data.export_latex_table()
+            
+        elif folder == 'perfil_jus' or folder == 'perfil_mon':
+            
+            u_bar_arr = []
+            for n in range(N):
+                u_bar_arr.append(stat_data.data_arr[n].u_bar_t)
+                stat_data.u_bar_s = np.array(u_bar_arr)
+                
+            print(u_bar_arr)
+            
+            if folder == 'perfil_jus':
+                stat_data.positions = get_spatial_points(f'data/pos_jus.txt')
+            elif folder == 'perfil_mon':
+                stat_data.positions = get_spatial_points(f'data/pos_mon.txt')
+            pass
+        
+        elif folder == 'hre_prob':
+            stat_data.export_latex_table()
+        
+        # print(stat_data.__str__())
+        stat_data.save_json()
+        # df = stat_data.to_data_frame(['u',])
+        # folder = FOLDER.split('/')[-2]
+        # export_data(df, f'CSV/{folder}')
+        # print(df)
+        
+        
     return None
 
 if __name__ == '__main__':
-    main()
+    FOLDERS = ('lre', 'hre', 'perfil_jus', 'perfil_mon')
+    run(FOLDERS)
     
     
     

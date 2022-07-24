@@ -1,8 +1,8 @@
 PERFILM results
 
-u_bar_t = 2.6826132393334614
-variance = 1.728332677090287
-std_dev = 1.314660669941216
-turbulence intensity = 49.00671668450666
-dissimetry coefficient = 1.0020776541343157
-flatenning coefficient = 3.75939104878976
+u_bar_t = 6.840769981077895
+variance = 0.0016126163395416763
+std_dev = 0.040157394581093984
+turbulence intensity = 0.005870303298045758
+dissimetry coefficient = 0.117981499743889
+flatenning coefficient = 2.665341437501894

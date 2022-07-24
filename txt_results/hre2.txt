@@ -3,6 +3,6 @@ HRE2 results
 u_bar_t = 5.094543331502138
 variance = 5.383082563093795
 std_dev = 2.3201470994516264
-turbulence intensity = 45.54180715482355
+turbulence intensity = 0.4554180715482355
 dissimetry coefficient = 0.40202249159876896
 flatenning coefficient = 2.6908769759790814

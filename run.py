@@ -51,6 +51,7 @@ def run(FOLDERS) -> None:
                 print(cov, corr)
                 cov_arr.append(cov)
                 corr_arr.append(corr)
+                
             stat_data.cov = cov_arr
             stat_data.corr_coef = corr_arr
             stat_data.export_latex_table()
@@ -72,12 +73,12 @@ def run(FOLDERS) -> None:
         elif folder == 'hre_prob':
             stat_data.export_latex_table()
         
-        print(stat_data.__str__())
+        # print(stat_data.__str__())
         stat_data.save_json()
-        df = stat_data.to_data_frame(['u',])
-        folder = FOLDER.split('/')[-2]
-        export_data(df, f'CSV/{folder}')
-        print(df)
+        # df = stat_data.to_data_frame(['u',])
+        # folder = FOLDER.split('/')[-2]
+        # export_data(df, f'CSV/{folder}')
+        # print(df)
         
         
     return None
@@ -85,5 +86,7 @@ def run(FOLDERS) -> None:
 
 if __name__ == '__main__':
     # FOLDERS = ('lre', 'hre', 'hre_prob', 'perfil_mon', 'perfil_jus')
+
     FOLDERS = ('perfil_mon','perfil_jus')
+    FOLDERS = ('lre', 'hre')
     run(FOLDERS)

@@ -19,11 +19,11 @@ def plot_instant_velocity(obj):
     ax = plt.axes()
     try:
         ax.set_title(f'Velocidade instantânea u_{obj["index"]}')
-        ax.plot(obj["times"][:len(obj["u"])], obj["u"])
+        ax.scatter(obj["times"][:len(obj["u"])], obj["u"])
     except KeyError:
         if obj["name"] == 'hre_prob':
             ax.set_title(f'Velocidade instantânea u_{obj["name"]}')
-            ax.plot(obj["times"], obj["u_bar_s"],)
+            ax.scatter(obj["times"], obj["u_bar_s"],)
     
 
     ax.plot(obj["times"], obj["u_bar_t"]*np.ones(len(obj["times"])), '-r')
@@ -51,8 +51,8 @@ def plot_pdf(obj):
     ax.set_title(f'Velocity by Probablility Density Function {obj["name"]}')
     ax.grid(1, 'both')
     
-    # ax.plot(x, pdf_u, '-b')
-    ax.hist(obj["u"], bins=500, density=True, stacked=True)
+    ax.plot(x, pdf_u, '-b')
+    # ax.hist(obj["u"], bins=500, density=True, stacked=True)
     ax.plot(x, gauss, '-r', lw=1.75)
     ax.vlines(obj["u_bar_t"], min(pdf_u), max(gauss), colors='k', linestyles='dashed')
     
@@ -70,7 +70,7 @@ def plot_pdf_hrep(obj):
     except FileExistsError:
         pass
         
-    x, pdf_u = obj["u_x_pdf"], np.array(obj["u_pdf"])/np.float64(obj["u_rms"])
+    x, pdf_u = obj["u_prime_x_pdf"], np.array(obj["u_prime_pdf"])
     mu = obj["u_bar_t"]
     sigma = obj["u_rms"]
     gauss = norm.pdf(x, mu, sigma)
@@ -80,8 +80,8 @@ def plot_pdf_hrep(obj):
     ax.set_title(f'Velocity by Probablility Density Function {obj["name"]}')
     ax.grid(1, 'both')
     
-    # ax.plot(x, pdf_u, '-b')
-    plt.hist(obj["u_bar_s"], bins=500, density=True, stacked=True)
+    ax.plot(x, pdf_u, '-b')
+    # plt.hist(obj["u_bar_s"], bins=500, density=True, stacked=True)
     ax.plot(x, gauss, '-r', lw=1.75)
     # ax.vlines(obj["u_bar_t"], min(pdf_u), max(gauss), colors='k', linestyles='dashed')
     

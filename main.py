@@ -4,6 +4,7 @@ import run
 # TIME_STEP = 0.0002 # > [s]
 # MEASUREMENTS = 16384 # > [adim]
 FOLDERS = ('lre', 'hre', 'hre_prob', 'perfil_mon', 'perfil_jus')
+FOLDERS = ('lre', 'hre')
 
 # MEASUREMENT_CONDITIONS = [T_FINAL, TIME_STEP, MEASUREMENTS]
 
