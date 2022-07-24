@@ -3,6 +3,6 @@ HREP23 results
 u_bar_t = 6.324139229689339
 variance = 6.58508926781143
 std_dev = 2.5661428775131423
-turbulence intensity = 0.40576951017556884
+turbulence intensity = 40.57695101755689
 dissimetry coefficient = 0.221000187863568
 flatenning coefficient = 2.435645653865521

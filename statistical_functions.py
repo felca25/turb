@@ -25,8 +25,7 @@ def statistical_mean(data_list):
             spacial_averages[j] = spacial_avg / len(data_list)
 
     return spacial_averages
-    plt.plot(data_list[0].times, spacial_averages)
-    plt.show()
+
 
 def moving_average(arr, window):
     i = 0
@@ -53,25 +52,23 @@ def calculate_ordered_moment(phi_prime:np.ndarray, order: int):
     
     return variance
 
-
-
-def calculate_kinetic_energy(phi_prime:np.ndarray):
+def calculate_kinetic_energy(u:np.ndarray):
     
-    kinetic = 0.5 * calculate_ordered_moment(phi_prime, 2)
+    kinetic = 0.5 * calculate_ordered_moment(u, 2)
     
     return kinetic
 
-def calculate_kinetic_energy(phi_prime:np.ndarray):
+def calculate_std_dev(phi_prime:np.ndarray):
     
     variance = calculate_ordered_moment(phi_prime, 2)
     
     return np.sqrt(variance)
 
-def calculate_turbulence_intensity(phi_bar:float, phi_prime:np.ndarray):
+def calculate_turbulence_intensity(u_bar:float, u_prime:np.ndarray):
     
-    phi_rms = calculate_kinetic_energy(phi_prime)
+    phi_rms = calculate_std_dev(u_prime)
     
-    return phi_rms / phi_bar
+    return phi_rms / np.abs(u_bar)
     
 def calculate_dissimetry_coef(phi_prime:np.ndarray):
     
@@ -85,7 +82,7 @@ def calculate_flatenning_coef(phi_prime:np.ndarray):
     sigma_4 = calculate_ordered_moment(phi_prime, 4)
     sigma_2 = calculate_ordered_moment(phi_prime, 2)
     
-    return sigma_4 / sigma_2**2
+    return sigma_4 / (sigma_2**2)
 
 def pdf(u_t, N=None):
     """Probability Density Function for the values of an
@@ -106,12 +103,13 @@ def pdf(u_t, N=None):
     u = np.sort(u_t)
     x = np.linspace(min(u), max(u), N)
     print('Calculating pdf...')
-    pdf = pdf_algorithm(u, x, prob, N, N_u, (1/N))
+    var = variance(u)
+    pdf = pdf_algorithm(u, x, prob, N, N_u, var, (1/N))
     print('Done alculating pdf.')
     
     return (x, pdf)
 
-def pdf_algorithm(u, x, pdf, N, N_u, TOL):
+def pdf_algorithm(u, x, pdf, N, N_u, var, TOL):
     """Main probability density function algorithm
     able to work with numba jit method
     
@@ -139,7 +137,7 @@ def pdf_algorithm(u, x, pdf, N, N_u, TOL):
             k += 1
             p += 1
         else:
-            pdf[i] = p/N_u
+            pdf[i] = (p)/(N_u)
             p = 0 
             i += 1
         
@@ -159,9 +157,14 @@ def covariance(a_prime:np.ndarray, b_prime:np.ndarray):
 def correlation_coeff(a_prime:np.ndarray, b_prime:np.ndarray):
     
     cov_ab = covariance(a_prime,b_prime)
-    a_rms = variance(a_prime)
-    b_rms = variance(b_prime)
+    a_rms = calculate_std_dev(a_prime)
+    b_rms = calculate_std_dev(b_prime)
     corr_coef = cov_ab / (a_rms * b_rms)
     
     return corr_coef
-    
+
+def gaussian(x, mu, sigma):
+    """
+    Gaussian function
+    """
+    return (1/(sigma*np.sqrt(2*np.pi)))*np.exp(-((x-mu)**2)/(2*sigma**2))

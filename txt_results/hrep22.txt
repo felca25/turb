@@ -3,6 +3,6 @@ HREP22 results
 u_bar_t = 6.295996478056516
 variance = 6.5434643866433335
 std_dev = 2.55801962202078
-turbulence intensity = 0.40629305161403206
+turbulence intensity = 40.62930516140321
 dissimetry coefficient = 0.2337048276061624
 flatenning coefficient = 2.401988031549156

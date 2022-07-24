@@ -1,0 +1,18 @@
+HRE_PROB results
+
+\begin{table}[htb]
+        \centering
+        \begin{tabular}{l|c}
+            Propriedades & Valor Estatístico\\ 
+            \hline\\ 
+        u_bar_t & 6.254618\\ 
+        variance & 6.597853\\ 
+        u_rms & 2.568509\\ 
+        turb_int & 0.410708\\ 
+        kinetic_energy & 3.298926\\ 
+        diss_coef & 0.262753\\ 
+        flat_coef & 2.428180\\ 
+    \end{tabular}
+                    \caption{Tabela de Resultados Para hre_prob}
+        \label{tab:hre}
+\end{table}

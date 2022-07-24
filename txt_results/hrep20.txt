@@ -3,6 +3,6 @@ HREP20 results
 u_bar_t = 6.201164804980761
 variance = 6.432219043217071
 std_dev = 2.5361819814865556
-turbulence intensity = 0.40898477322349186
+turbulence intensity = 40.89847732234919
 dissimetry coefficient = 0.2840168429647781
 flatenning coefficient = 2.465659137920921

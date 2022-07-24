@@ -3,6 +3,6 @@ LRE1 results
 u_bar_t = 1.7138227186717183
 variance = 0.00019431442929534397
 std_dev = 0.013939671061231824
-turbulence intensity = 0.008133671534028695
+turbulence intensity = 0.8133671534028695
 dissimetry coefficient = -0.04195305594611269
 flatenning coefficient = 3.406720430470953

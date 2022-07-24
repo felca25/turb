@@ -3,6 +3,6 @@ PERFILM results
 u_bar_t = 2.6826132393334614
 variance = 1.728332677090287
 std_dev = 1.314660669941216
-turbulence intensity = 0.49006716684506657
+turbulence intensity = 49.00671668450666
 dissimetry coefficient = 1.0020776541343157
 flatenning coefficient = 3.75939104878976

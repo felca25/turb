@@ -53,6 +53,7 @@ def run(FOLDERS) -> None:
                 corr_arr.append(corr)
             stat_data.cov = cov_arr
             stat_data.corr_coef = corr_arr
+            stat_data.export_latex_table()
             
         elif folder == 'perfil_jus' or folder == 'perfil_mon':
             
@@ -61,11 +62,15 @@ def run(FOLDERS) -> None:
                 u_bar_arr.append(stat_data.data_arr[n].u_bar_t)
                 stat_data.u_bar_s = np.array(u_bar_arr)
             print(u_bar_arr)
+            
             if folder == 'perfil_jus':
                 stat_data.positions = get_spatial_points(f'data/pos_jus.txt')
             elif folder == 'perfil_mon':
                 stat_data.positions = get_spatial_points(f'data/pos_mon.txt')
             pass
+        
+        elif folder == 'hre_prob':
+            stat_data.export_latex_table()
         
         print(stat_data.__str__())
         stat_data.save_json()
@@ -79,6 +84,6 @@ def run(FOLDERS) -> None:
 
 
 if __name__ == '__main__':
-    FOLDERS = ('lre', 'hre', 'hre_prob', 'perfil_mon', 'perfil_jus')
-    FOLDERS = ('perfil_mon',)
+    # FOLDERS = ('lre', 'hre', 'hre_prob', 'perfil_mon', 'perfil_jus')
+    FOLDERS = ('perfil_mon','perfil_jus')
     run(FOLDERS)

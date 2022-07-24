@@ -39,7 +39,7 @@ class TemporalData:
         self.calculate_properties()
         
         if self.name[:-1] == 'lre' or self.name[:-1] == 'hre':
-            self.index = self.index[1]
+            self.index = self.index
     
     def calculate_properties(self) -> None:
         
@@ -48,10 +48,10 @@ class TemporalData:
         self.kinetic_energy = .5 * calculate_ordered_moment(self.u_prime, 2)
         self.variance = calculate_ordered_moment(self.u_prime, 2)
         self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime, 2))
-        self.turb_int = calculate_turbulence_intensity(self.u_bar_t, self.u_prime)
+        self.turb_int = calculate_turbulence_intensity(self.u_bar_t, self.u_prime)*100
         self.diss_coef = calculate_dissimetry_coef(self.u_prime)
         self.flat_coef = calculate_flatenning_coef(self.u_prime)
-        self.u_x_pdf, self.u_pdf = pdf(self.u)
+        self.u_x_pdf, self.u_pdf = pdf(self.u, 500)
         self.u_prime_x_pdf, self.u_prime_pdf = pdf(self.u_prime)
         
     def save_txt(self):
@@ -157,11 +157,17 @@ class TemporalDatas:
         self.variance = calculate_ordered_moment(self.u_prime, 2)
         self.u_rms = np.sqrt(calculate_ordered_moment(self.u_prime_bar_s, 2))
         self.kinetic_energy = calculate_kinetic_energy(self.u_prime)
-        self.turb_int = calculate_turbulence_intensity(self.u_bar_s, self.u_prime_bar_s)
+        self.turb_int = calculate_turbulence_intensity(self.u_bar_s, self.u_prime_bar_s)*100
         self.diss_coef = calculate_dissimetry_coef(self.u_prime_bar_s)
         self.flat_coef = calculate_flatenning_coef(self.u_prime_bar_s)
-        self.u_x_pdf, self.u_pdf = pdf(self.u_bar_s)
+        self.u_x_pdf, self.u_pdf = pdf(self.u_bar_s,len(self.u_bar_s))
         self.u_prime_x_pdf, self.u_prime_pdf = pdf(self.u_prime_bar_s)
+        
+        if self.data_arr[0].name == 'PERFILM':
+            u_t = [self.data_arr[i].u_bar_t for i in range(self.N)]
+            u_prime = u_t - self.u_bar_t
+            self.u_bar_s = u_t
+            self.turb_int = calculate_turbulence_intensity(u_t, u_prime)*100
         
     def calculate_cov_corr(self, index_a, index_b):
         print(self.data_arr[index_a].name)
@@ -221,7 +227,7 @@ class TemporalDatas:
         self.u_prime_bar_s = self.u_prime_bar_s.tolist()
         self.kinetic_energy = self.kinetic_energy.tolist()
         self.variance = self.variance.tolist()
-        # self.u_rms = self.u_rms.tolist()
+        self.u_rms = self.u_rms.tolist()
         self.turb_int = self.turb_int.tolist()
         self.u_x_pdf = self.u_x_pdf.tolist()
         self.u_pdf = self.u_pdf.tolist()
@@ -242,7 +248,7 @@ class TemporalDatas:
         self.u_prime_bar_s = np.array(self.u_prime_bar_s)
         self.kinetic_energy = np.array(self.kinetic_energy)
         self.variance = np.array(self.variance)
-        # self.u_rms = np.array(self.u_rms)
+        self.u_rms = np.array(self.u_rms)
         self.turb_int = np.array(self.turb_int)
         self.u_x_pdf = np.array(self.u_x_pdf)
         self.u_pdf = np.array(self.u_pdf)
@@ -299,6 +305,38 @@ class TemporalDatas:
             for i in range(len(self.data_arr)):   
                 df[f'u_prime_{i+1}'] = df['u_bar'] - df[f'u_{i+1}']
             return df
+        
+    def export_latex_table(self):
+        prop = ["u_bar_t", "variance", "u_rms", "turb_int", "kinetic_energy", "diss_coef", "flat_coef"]
+        dic = {prop[i]: [f'{self.data_arr[j].__dict__[prop[i]]:.6f}' for j in range(len(self.data_arr))] \
+        for i in range(len(prop))}
+        
+        if self.name != 'hre_prob':
+            with open(f'txt_results/latex_{self.name}.txt', 'w') as outfile:
+                outfile.write(f'{self.name.upper()} results\n\n')
+                outfile.write(f'\\begin{{table}}[htb]\n\
+        \\centering\n\
+        \\begin{{tabular}}{{l|{"|".join(["c" for i in range(len(self.data_arr))])}}}\n\
+            Propriedades & {" & ".join([f"$u_{i+1}$" for i in range(len(self.data_arr))])}\\\ \n\
+            \hline\\\ \n')
+                for i in range(len(prop)):
+                    outfile.write(f'        {prop[i]} & {" & ".join(dic[prop[i]])}\\\ \n')
+                outfile.write(f'    \end{{tabular}}\n\
+                    \caption{{Tabela de Resultados Para {self.name}}}\n\
+        \label{{tab:hre}}\n\\end{{table}}\n')
+        # elif self.name == 'hre_prob':
+        #     with open(f'txt_results/latex_{self.name}.txt', 'w') as outfile:
+        #         outfile.write(f'{self.name.upper()} results\n\n')
+        #         outfile.write(f'\\begin{{table}}[htb]\n\
+        # \\centering\n\
+        # \\begin{{tabular}}{{l|c}}\n\
+        #     Propriedades & Valor Estatístico\\\ \n\
+        #     \hline\\\ \n')
+        #         for i in range(len(prop)):
+        #             outfile.write(f'        {prop[i]} & {np.mean(np.float64(dic[prop[i]])):.6f}\\\ \n')
+        #         outfile.write(f'    \end{{tabular}}\n\
+        #             \caption{{Tabela de Resultados Para {self.name}}}\n\
+        # \label{{tab:hre}}\n\\end{{table}}\n')
         
     
 

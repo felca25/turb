@@ -3,6 +3,6 @@ HREP14 results
 u_bar_t = 6.2940052005127995
 variance = 6.429023487462619
 std_dev = 2.535551909833955
-turbulence intensity = 0.4028518930405988
+turbulence intensity = 40.285189304059884
 dissimetry coefficient = 0.22589707700070774
 flatenning coefficient = 2.410498064045257
